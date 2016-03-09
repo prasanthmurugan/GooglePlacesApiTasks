@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.example.admin.googleplacesapitasks.MainActivity">
+
+    <AutoCompleteTextView
+        android:id="@+id/auto_complete"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:singleLine="true"/>
+    <!-- fragment for the google maps-->
+    <!-- specify the fragment name otherwise the inflate exception will come-->
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@+id/auto_complete">
+        <fragment
+            android:id="@+id/map_fragment"
+            android:name="com.google.android.gms.maps.SupportMapFragment"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"/>
+
+        <TextView
+            android:id="@+id/type"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/type"
+            android:layout_gravity="bottom|end|right"
+            android:textSize="@dimen/font_20sp"
+            android:layout_marginBottom="50dp"
+            android:layout_marginRight="25dp"
+            android:layout_marginEnd="25dp"/>
+    </FrameLayout>
+</RelativeLayout>

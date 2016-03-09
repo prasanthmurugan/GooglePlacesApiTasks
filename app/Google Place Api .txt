@@ -1,0 +1,248 @@
+						//***GOOGLE PLACES API***//
+						
+//**Place description and the Place id from the api 
+		
+		1.Google Api Key
+		//get the google API key from the google developer console Refer :D:\pr\prProjects\DATA\concepts\Google Api & YouTube -Window popUp
+	
+		2.Specify the necessary utils in the app manifest file
+			//add the meta-data inside the application 
+				<meta-data
+						android:name="com.google.android.geo.API_KEY"
+						android:value="AIzaSyDXdXhbfPlNeKAZGC6o42z1Un7Qiq5W2Nk"/>
+
+			//add the uses-permission to the manifest file
+				<uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
+				<uses-permission android:name="android.permission.INTERNET"/>			
+
+		3.Java code:
+			- Create the object for autocomplete textview and the set the adapter In the main activity
+				AutoCompleteTextView mAutoCompleteTextView;
+				mAutoCompleteTextView = (AutoCompleteTextView)findViewById(R.id.auto_complete);
+				GooglePlacesAdapter mGooglePlacesAdapter;
+				mGooglePlacesAdapter = new GooglePlacesAdapter(this,android.R.layout.simple_list_item_1);
+				mAutoCompleteTextView.setAdapter(mGooglePlacesAdapter);
+				mAutoCompleteTextView.setThreshold(2);
+				
+			- Create the custom Adapter that extends the Array Adapter 
+				public class GooglePlacesAdapter extends ArrayAdapter<GooglePlacesAdapter.GooglePlaceDescription> implements Filterable {
+			
+			-Create the object for the 
+				public  static final String API = "https://maps.googleapis.com/maps/api/place";
+				public static final  String TYPE = "/autocomplete";
+				public static final String JSON = "/json";
+				public static final String BROWSER_KEY = "AIzaSyCzRtbkkFUhmHDWq4DhGtXlTwziBZxuMKg";
+	
+			- Implement filterable override the method getFilter()
+			//Create the Filter object and overide the methods
+			//FilterResults object
+			//PlaceListAsyncTask - is the used defined method
+			
+				@Override
+					public Filter getFilter() {
+						Filter filter = new Filter() {
+							@Override
+							protected FilterResults performFiltering(CharSequence constraint) {
+								Log.e("place-constraint",constraint.toString());
+								FilterResults filterResults =new FilterResults();
+								mArraylist=PlaceListAsyncTask(constraint.toString());//calls the method PlaceListAsyncTask and assign the returned arraylist
+								filterResults.values=mArraylist;//set the filterResults values as the arraylist so that the typed words will be filtered based on the arraylist
+								Log.e("place-mArraylist",mArraylist.toString());
+								filterResults.count=mArraylist.size();
+								return filterResults;
+							}
+
+							@Override
+							protected void publishResults(CharSequence constraint, FilterResults results) {
+								if (results != null && results.count > 0) {
+									notifyDataSetChanged();
+								} else {
+									notifyDataSetInvalidated();
+								}
+							}
+						};
+						return filter;
+					}
+			//PlaceListAsyncTask-Custom method to get the json values from the api
+			
+					ArrayList<GooglePlaceDescription> PlaceListAsyncTask(String params)
+					{
+						ArrayList<GooglePlaceDescription> placesList=new ArrayList<>();
+						String webData="",data="";
+						StringBuilder stringBuilder=new StringBuilder(API+TYPE+JSON);
+						stringBuilder.append("?input="+params);
+						stringBuilder.append("&types=geocode");
+						stringBuilder.append("&language=en");
+						stringBuilder.append("&key=" + BROWSER_KEY);
+						Log.e("place-StringBuilder",stringBuilder.toString());
+						try {
+							URL url = new URL(stringBuilder.toString());
+							HttpURLConnection connection= (HttpURLConnection) url.openConnection();
+							InputStream io = connection.getInputStream();
+							BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(io));
+							while ((data=bufferedReader.readLine())!=null){
+								webData+=data+"\n";
+							}
+							JSONObject jsonObject = new JSONObject(webData);
+							JSONArray jsonArray = jsonObject.getJSONArray("predictions");
+							Log.e("place-jsonArray",""+jsonArray);
+							for(int i=0;i<jsonArray.length();i++)
+							{
+								placesList.add(new GooglePlaceDescription(jsonArray.getJSONObject(i).getString("place_id"), jsonArray.getJSONObject(i).getString("description")));
+							}
+						} catch (MalformedURLException e) {
+							e.printStackTrace();
+						} catch (IOException e) {
+							e.printStackTrace();
+						} catch (JSONException e) {
+							e.printStackTrace();
+						}
+						return placesList;
+					}
+					
+			- override getCount() and getItem()
+				@Override
+				public int getCount() {
+					if(mArraylist==null){
+						Log.v("LOG","Warn, null filteredData");
+						return 0;
+					}else{
+						return mArraylist.size();
+					}
+				}
+
+				@Override
+				public GooglePlaceDescription getItem(int position) {
+					return mArraylist.get(position);
+				}
+						
+			-Class for the arraylist object
+			//toString will return the value to be place on the given list id
+					class GooglePlaceDescription
+					{
+						String placeId,placeDescription;
+						public GooglePlaceDescription(String placeId,String placeDescription)
+						{
+							this.placeId = placeId;
+							this.placeDescription = placeDescription;
+						}
+
+						@Override
+						public String toString() {
+							return placeDescription;
+						}
+					}
+					
+
+		error:
+
+		1.unable to inflate Exceptions
+		 -specify the name in the fragment of the .xml file
+		 <fragment
+		  android:name="com.google.android.gms.maps.SupportMapFragment"/>
+		  
+//**LatLng from the Place Id
+		
+		1.implements the OnMapReadyCallback and override the method 
+				
+				- public class MainActivity extends AppCompatActivity implements OnMapReadyCallback {
+				 
+				 //override method of onMapReady call back
+				
+				@Override
+				public void onMapReady(GoogleMap googleMap) {
+					//**Called at first when the map is created
+					outerMapObj=googleMap;
+					//**addmarker is used to add the marker to the map obj-outerMapObj
+					//**MarkerOptions() is the class the contains all the marker option such as position,title,anchor,alpha,draggable
+					outerMapObj.addMarker(new MarkerOptions().position(new LatLng(Double.parseDouble(lat), Double.parseDouble(lng)))
+							.title(placeDescription));
+					//**CameraPosition class is used to customize the camera view of the map provides various options such as the zoom,target,build
+					CameraPosition cameraPosition = CameraPosition.builder()
+							.target(new LatLng(Double.parseDouble(lat), Double.parseDouble(lng)))
+							.zoom(8)
+							.build();
+
+			//        outerMapObj.animateCamera(CameraUpdateFactory.newLatLng(new LatLng(Double.parseDouble(lat), Double.parseDouble(lng))));
+
+					//**animate camera is used to set the camera option to the google map
+					outerMapObj.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
+					}
+				
+		2.-after getting the api on the auto_complete textview onItemClick listener
+				mAutoCompleteTextView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+					@Override
+					public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+						Log.e("Main-OnItemClick", "" + position);
+						//**below statement is used to access the class inside the adapter to get the item placeId and placeDescription
+						GooglePlacesAdapter.GooglePlaceDescription googlePlacesDescription=mGooglePlacesAdapter.getItem(position);
+						new GetLatLon().execute(googlePlacesDescription.placeId);//call to the asynchronous task
+						placeDescription=googlePlacesDescription.placeDescription;//placeDescription-is the string inorder to show the title of the map marker
+					}
+				});
+
+		3.-AsyncTask that make the call
+				class GetLatLon extends AsyncTask<String,String,String>{
+					String webData="",data="";
+					@Override
+					protected String doInBackground(String... params) {
+						Log.e("main-Came", "asynTask");
+						//**stringBuilder contains the url link for the task
+						//GooglePlacesAdapter.API & GooglePlacesAdapter.JSON is string in the adapter
+						StringBuilder stringBuilder =new StringBuilder(GooglePlacesAdapter.API+"/details"+GooglePlacesAdapter.JSON);
+						stringBuilder.append("?placeid="+params[0]);
+						stringBuilder.append("&key=" + GooglePlacesAdapter.BROWSER_KEY);
+						Log.e("main-string",stringBuilder.toString());
+						try {
+							URL url = new URL(stringBuilder.toString());
+							HttpURLConnection con=(HttpURLConnection)url.openConnection();
+							InputStream io=con.getInputStream();
+							BufferedReader bufferedReader= new BufferedReader(new InputStreamReader(io));
+							while((data=bufferedReader.readLine())!=null){
+								webData+=data+"\n";
+			//                    Log.e("main=inside-webdata",webData);
+							}
+						} catch (MalformedURLException e) {
+							e.printStackTrace();
+						} catch (IOException e) {
+							e.printStackTrace();
+						}
+			//            Log.e("main-webdata",webData);
+						return webData;
+					}
+
+					@Override
+					protected void onPostExecute(String s){
+						LatLonParser latLonParser;
+						//gson parser object
+						Gson gson = new Gson();
+						latLonParser = gson.fromJson(s,LatLonParser.class);
+						Log.e("lat->",latLonParser.result.geometry.location.lat);
+						Log.e("lng->",latLonParser.result.geometry.location.lng);
+						lat = latLonParser.result.geometry.location.lat;//lat is the global string
+						lng = latLonParser.result.geometry.location.lng;//lng is the global string 
+						supportMapFragment.getMapAsync(MainActivity.this);
+						super.onPostExecute(s);
+					}
+				}
+		4.latLonParser -
+			public class LatLonParser implements Serializable 
+			{
+				public Result result;
+				public class Result implements Serializable
+				{
+					public Geometry geometry;
+					public class Geometry implements Serializable
+					{
+						public Location location;
+						public class Location implements Serializable
+						{
+							String lat,lng;
+						}
+					}
+				}
+			}
+			
+
+
+ 		  

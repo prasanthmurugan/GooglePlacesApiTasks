@@ -1,0 +1,40 @@
+Reference:
+http://www.truiton.com/2015/04/obtaining-sha1-fingerprint-android-keystore/
+https://developers.google.com/drive/android/auth
+
+How To create a Api key For using Google services
+step 1:
+	login to the google developer console with ur gmail account
+step 2:
+	- On the right corner click on the project drop down
+		+ if existing project appears select one
+		+ click on the create new project 
+			-provide the name for the new project
+
+step 3:
+	- On the right side the api manager show the two options
+		1.overview 2.credentials
+	-click credentials
+		+create the new credentials and then select the api key 
+		+A dialog open and the select the android key
+step 4:
+	-create android api page appears
+	- click on the add package name and fingerprint
+	- provide the pakage name 
+		eg: package="com.example.admin.popupwindowsample" show in the manifest.xml root element
+	- provide the fingerprint
+		+ open the cmd 
+		+ move to the directory C:\Program Files\Java\jdk1.7.0_03\bin>keytool
+		+ enter the following command -> keytool -list -v -keystore "%USERPROFILE%\.android\debug.keystore" -alias androiddebugkey -storepass android -keypass android
+		+ copy the sha1 value 
+			eg:sha 1 : 2F:6A:4B:6E:4E:C5:0F:7D:CB:11:7D:D7:47:1E:A8:F6:DF:67:98:DF
+	- paste the sha1 value in the dialog
+	- click the create button
+	
+step 5 :
+	- Api key is create for the package name and the sha1
+	- finally click on the overview and enable the keys that are needed for ur project
+		eg:google maps,youtube,social api 
+    -use the api key 
+		eg: API key	: AIzaSyDw3rspSCApk2gSKjumvbefJ8e_7c3OsAE
+	

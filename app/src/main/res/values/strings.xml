@@ -1,0 +1,26 @@
+<resources>
+    <string name="app_name">GooglePlacesApiTasks</string>
+    <string name="type">Type</string>
+    <string name="select_all">Select All</string>
+    <string name="unselect_all">UnSelect All</string>
+    <string name="done">Done</string>
+
+    <string name="type_banks">bank</string>
+    <string name="type_grocery">grocery or supermarket</string>
+    <string name="type_post_office">post office</string>
+    <string name="type_transports">bus station</string>
+    <string name="type_railway_station">train station</string>
+    <string name="type_hospital">hospital</string>
+    <string name="type_parks">park</string>
+    <string name="type_university">university</string>
+    <string name="type_restaurant">restaurant</string>
+    <string name="type_fire_brigade">fire station</string>
+    <string name="type_library">library</string>
+    <string name="type_schools">school</string>
+    <string name="type_fuels">gas station</string>
+    <string name="type_police">police</string>
+    <string name="type_xhopping">shopping mall</string>
+
+    <string name="title_activity_main2">Main2Activity</string>
+
+</resources>
